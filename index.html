@@ -48,26 +48,14 @@ nav button:hover, .active-nav {
     overflow-y: auto;
     padding-top: 20px;
 }
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-}
-.sidebar li {
-    padding: 12px 20px;
-    cursor: pointer;
-    color: #ecf0f1;
-    transition: background 0.3s;
-}
-.sidebar li:hover, .sidebar li.active {
-    background-color: #2980b9;
-}
 .content {
-    margin-left: 250px;
+    margin-left: 0;
     margin-top: 70px;
     padding: 20px;
     min-height: calc(100vh - 70px);
     background-color: #ecf0f1;
     transition: margin-left 0.3s;
+    width: calc(100% - 0px);
 }
 h2 { margin-top: 0; color: #2c3e50; }
 table {
@@ -91,7 +79,8 @@ button {
         width: 200px;
     }
     .content {
-        margin-left: 200px;
+        margin-left: 0;
+        width: 100%;
     }
 }
 /* Notification gaya */
@@ -124,7 +113,6 @@ button {
     <button onclick="showMain('notifikasi')">Notifikasi & Log</button>
 </nav>
 
-<div class="sidebar" id="sidebar"></div>
 <div class="content" id="mainContent"></div>
 <!-- Tempat Notifikasi -->
 <div id="notificationContainer"></div>
@@ -133,7 +121,6 @@ button {
 
 <script>
 const mainContent = document.getElementById('mainContent');
-const sidebar = document.getElementById('sidebar');
 
 function showMain(page) {
     // Reset semua aktif
@@ -167,31 +154,6 @@ function showMain(page) {
 
 // ================== Dashboard ==================
 function renderDashboard() {
-    sidebar.innerHTML = `
-        <ul>
-            <li class="active" onclick="loadDashboard()">Dashboard Utama</li>
-            <li onclick="loadStatusDeployment()">Monitoring Deployment</li>
-            <li onclick="loadRiwayat()">Riwayat Deployment</li>
-            <li onclick="loadVersi()">Versi & Rollback</li>
-        </ul>
-    `;
-    mainContent.innerHTML = `
-        <h2>Dashboard Utama</h2>
-        <div class="card">
-            <h3>Status Sistem</h3>
-            <p>Sistem berjalan normal. Tidak ada error kritis.</p>
-        </div>
-        <div class="card">
-            <h3>Aktivitas Terakhir</h3>
-            <ul>
-                <li>Deployment APK terbaru - 1 jam lalu</li>
-                <li>Error crash dilaporkan - 30 menit lalu</li>
-            </ul>
-        </div>
-    `;
-}
-
-function loadDashboard() {
     mainContent.innerHTML = `
         <h2>Dashboard Utama</h2>
         <div class="card">
@@ -247,29 +209,11 @@ function loadRiwayat() {
         <h2>Riwayat Deployment</h2>
         <table>
             <thead>
-                <tr>
-                    <th>Build</th>
-                    <th>Perusahaan</th>
-                    <th>Tanggal</th>
-                    <th>Status</th>
-                    <th>Keterangan</th>
-                </tr>
+                <tr><th>Build</th><th>Perusahaan</th><th>Tanggal</th><th>Status</th><th>Keterangan</th></tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1.0.2</td>
-                    <td>Perusahaan A</td>
-                    <td>2024-04-24</td>
-                    <td>Sukses</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>1.0.3</td>
-                    <td>Perusahaan B</td>
-                    <td>2024-04-25</td>
-                    <td>Gagal</td>
-                    <td>Error jaringan</td>
-                </tr>
+                <tr><td>1.0.2</td><td>Perusahaan A</td><td>2024-04-24</td><td>Sukses</td><td>-</td></tr>
+                <tr><td>1.0.3</td><td>Perusahaan B</td><td>2024-04-25</td><td>Gagal</td><td>Error jaringan</td></tr>
             </tbody>
         </table>
     `;
@@ -292,13 +236,6 @@ function loadVersi() {
 
 // ================== Monitoring ==================
 function renderMonitoring() {
-    sidebar.innerHTML = `
-        <ul>
-            <li class="active" onclick="loadErrorCrash()">Error & Crash Reports</li>
-            <li onclick="loadLogAktivitas()">Log Aktivitas Sistem</li>
-            <li onclick="loadNotifikasiOtomatis()">Notifikasi Otomatis</li>
-        </ul>
-    `;
     mainContent.innerHTML = `
         <h2>Monitoring Sistem</h2>
         <div class="card">
@@ -339,19 +276,12 @@ function loadNotifikasiOtomatis() {
     `;
 }
 
-// ================== Pengelolaan Data ==================
-function renderManajemen() {
-    sidebar.innerHTML = `
-        <ul>
-            <li class="active" onclick="loadDaftarPerusahaan()">Daftar Perusahaan</li>
-            <li onclick="loadPengaturanAkses()">Pengaturan Akses</li>
-            <li onclick="loadPengaturanDeployment()">Pengaturan Deployment</li>
-        </ul>
-    `;
+// ================== Pengelolaan Deployment ==================
+function loadPengelolaanDeployment() {
     mainContent.innerHTML = `
         <h2>Manajemen Deployment</h2>
         <div class="card">
-            <h3>Upload APK Terbaru</h3>
+            <h3>Upload APK Baru</h3>
             <button style="padding:10px 15px; background-color:#27ae60; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="triggerFileUpload()">Upload APK Baru</button>
             <input type="file" id="apkFileInput" style="display:none;" accept=".apk" onchange="previewAPK()" />
         </div>
@@ -378,31 +308,29 @@ function previewAPK() {
         showNotification(`File APK "${file.name}" dipilih.`);
     }
 }
-
 function uploadAPK() {
     if (!apkToUpload) {
         showError('Silakan pilih file APK terlebih dahulu.');
         return;
     }
-    // Simulasi upload dan deploy
     const target = document.getElementById('targetCompanySelect').value;
     showNotification(`APK "${apkToUpload.name}" berhasil diupload dan dikirim ke ${target}.`);
     apkToUpload = null;
     document.getElementById('apkFileInput').value = '';
 }
 
-// ================== Daftar Perusahaan ==================
-function loadDaftarPerusahaan() {
+// ================== Pengelolaan Perusahaan ==================
+let daftarPerusahaan = [
+    { id: 1, nama: 'Perusahaan A', alamat: 'Jakarta', akses: 'Admin, User' },
+    { id: 2, nama: 'Perusahaan B', alamat: 'Bandung', akses: 'Admin' }
+];
+
+function loadPengelolaanPerusahaan() {
     mainContent.innerHTML = `
-        <h2>Daftar Perusahaan</h2>
+        <h2>Pengelolaan Perusahaan</h2>
         <table>
             <thead>
-                <tr>
-                    <th>Nama Perusahaan</th>
-                    <th>Alamat</th>
-                    <th>Akses</th>
-                    <th>Konfigurasi</th>
-                </tr>
+                <tr><th>Nama</th><th>Alamat</th><th>Akses</th><th>Aksi</th></tr>
             </thead>
             <tbody id="companyTableBody"></tbody>
         </table>
@@ -410,7 +338,6 @@ function loadDaftarPerusahaan() {
     `;
     const tbody = document.getElementById('companyTableBody');
     tbody.innerHTML = '';
-    // Data perusahaan dari array
     daftarPerusahaan.forEach(p => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -425,12 +352,6 @@ function loadDaftarPerusahaan() {
         tbody.appendChild(row);
     });
 }
-
-let daftarPerusahaan = [
-    { id: 1, nama: 'Perusahaan A', alamat: 'Jakarta', akses: 'Admin, User' },
-    { id: 2, nama: 'Perusahaan B', alamat: 'Bandung', akses: 'Admin' }
-];
-
 function addCompany() {
     const nama = prompt("Nama Perusahaan:");
     if (nama) {
@@ -438,7 +359,7 @@ function addCompany() {
         const akses = prompt("Hak Akses (misal: Admin, User):");
         const id = Date.now();
         daftarPerusahaan.push({ id, nama, alamat, akses });
-        loadDaftarPerusahaan();
+        loadPengelolaanPerusahaan();
         showNotification("Perusahaan berhasil ditambahkan");
     }
 }
@@ -452,7 +373,7 @@ function editCompany(id) {
             p.nama = nama;
             p.alamat = alamat;
             p.akses = akses;
-            loadDaftarPerusahaan();
+            loadPengelolaanPerusahaan();
             showNotification("Perusahaan berhasil diedit");
         }
     }
@@ -460,19 +381,13 @@ function editCompany(id) {
 function deleteCompany(id) {
     if (confirm("Hapus perusahaan ini?")) {
         daftarPerusahaan = daftarPerusahaan.filter(p => p.id !== id);
-        loadDaftarPerusahaan();
+        loadPengelolaanPerusahaan();
         showNotification("Perusahaan dihapus");
     }
 }
 
 // ================== Pengujian & Validasi ==================
 function renderPengujian() {
-    sidebar.innerHTML = `
-        <ul>
-            <li class="active" onclick="loadPengujianBuild()">Pengujian Build</li>
-            <li onclick="loadFeedback()">Feedback Perusahaan</li>
-        </ul>
-    `;
     mainContent.innerHTML = `
         <h2>Pengujian & Validasi</h2>
         <div class="card">
@@ -519,14 +434,7 @@ function sendFeedback() {
 }
 
 // ================== Notifikasi & Grafik ==================
-function renderNotifikasi() {
-    sidebar.innerHTML = `
-        <ul>
-            <li class="active" onclick="loadNotifikasiPerusahaan()">Notifikasi ke Perusahaan</li>
-            <li onclick="loadLogAktivitas()">Log Aktivitas Sistem</li>
-            <li onclick="loadErrorCrash()">Error & Crash Reports</li>
-        </ul>
-    `;
+function loadNotifikasi() {
     mainContent.innerHTML = `
         <h2>Notifikasi & Log Sistem</h2>
         <div class="card">
@@ -535,8 +443,6 @@ function renderNotifikasi() {
         </div>
     `;
 }
-
-// ================== Grafik ==================
 function renderGrafik() {
     mainContent.innerHTML = `
         <h2>Grafik Sistem</h2>
@@ -580,10 +486,10 @@ function showNotification(msg, type='success') {
     }, 3000);
 }
 
-function showError(message) {
+function showError(msg) {
     const errorDiv = document.getElementById('errorReport');
     errorDiv.innerHTML = `
-        <strong>Error:</strong> ${message}
+        <strong>Error:</strong> ${msg}
         <div style="margin-top:10px; text-align:right;">
             <button onclick="closeError()" style="background:none; border:none; color:#fff; font-weight:bold; cursor:pointer;">Tutup</button>
         </div>
@@ -594,9 +500,9 @@ function closeError() {
     document.getElementById('errorReport').style.display = 'none';
 }
 
-// ================== Init ==================
+// ================== Inisialisasi ==================
 showMain('dashboard');
-</script>
 
+</script>
 </body>
 </html>
